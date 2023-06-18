@@ -4,6 +4,10 @@ from typing import Any
 
 
 class ColorMapping:
+    """
+    ColorMapping can be overrwrite to color specified.
+    * Reference: [ASCI color code](https://talyian.github.io/ansicolors/)
+    """
     DEBUG = "\x1b[37m"
     INFO = "\x1b[32m"
     WARNING = "\x1b[33m"
@@ -38,17 +42,20 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
-class NewLogger: 
+class Logger: 
     _instance = None 
     def __new__(cls, *args, **kwargs): 
         if cls._instance is None: 
             cls._instance = super().__new__(cls) 
         return cls._instance 
          
-    def __init__(self, c:ColorMapping):
-        self.logger = logging.getLogger("foo")
+    def __init__(self, tag:str, c:ColorMapping = None):
+        self.logger = logging.getLogger(tag)
         self.logger.setLevel(logging.DEBUG)
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
-        ch.setFormatter(CustomFormatter(cmap=c))
+        if not c:
+            ch.setFormatter(CustomFormatter(cmap=ColorMapping()))
+        else: 
+            ch.setFormatter(CustomFormatter(cmap=c))
         self.logger.addHandler(ch)
